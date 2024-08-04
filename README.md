@@ -15,13 +15,13 @@ VAge_torch:
   README.md
 
 
-#Working Plan
+# Working Plan
 ##2024-week-31:
-[] download the demo data folder
-[] make the io.py, to finish the following functionality
-  [] read single visit feature from feature data file
-  [] read the mask from mask file
-  [] make the saved folder structure and saved file as the following structure
+* [] download the demo data folder
+* [] make the io.py, to finish the following functionality
+* [] read single visit feature from feature data file
+* [] read the mask from mask file
+*  [] make the saved folder structure and saved file as the following structure
         feat_root/feat_type/preprocess_tool/version/visit_id/mask_name/ROI_name.pkl
         feat_type: a sting, 'volumn', 'surface' or .....
         
