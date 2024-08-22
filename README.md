@@ -1,8 +1,11 @@
-this repo is for the voxel aging project using pytorch (previous use MxNet). 
+this repo is for the voxel aging project using pytorch (previous use MxNet).
 
-# Code structure 
+# Code structure
+
 VAge_torch:
-  voxel_age: # the main folder for the code 
+
+
+  voxel_age: # the main folder for the code
     model.py
     train.py
     loss.py
@@ -10,10 +13,15 @@ VAge_torch:
     io.py
     vis.py
     data_manage.py
-    
-  demo_test: 
-  README.md
 
+  demo_test:  # a folder contains the demo and testing
+
+
+
+exp:  # a folder contains the experiment scripts
+
+
+  README.md
 
 #Working Plan
 ##2024-week-31:
@@ -22,15 +30,15 @@ VAge_torch:
   [] read single visit feature from feature data file
   [] read the mask from mask file
   [] make the saved folder structure and saved file as the following structure
-        feat_root/feat_type/preprocess_tool/version/visit_id/mask_name/ROI_name.pkl
+        feat_root/feat_type/feat_type_detail/preprocess_tool/version/dataset/visit_id/mask_name/ROI_name.pkl
         feat_type: a sting, 'volumn', 'surface' or .....
-        
+
+    feat_type_detail：more detailed descriptioni, like wmn1, thickness,.....
+
+
   [] make a dict that save the visit_id => clinical information
-  [] given the list of sub_id, and required feat_type, processing_tools, version, mask_name, ROI_list (if it is not given, extract all ROIs), 
-     generate a list of ROI_Feature_matrix, 
-  
-
-
+  [] given the list of sub_id, and required feat_type, processing_tools, version, mask_name, ROI_list (if it is not given, extract all ROIs),
+     generate a list of ROI_Feature_matrix,
 
 ##2024-week-32:
 [] graph.py
@@ -52,7 +60,5 @@ VAge_torch:
 [] vis.py (parts)
   [] multi-slice grid plot overlay with heatmap
   [] fixed plot heatmap range for multiple slice overlay plot
-
-
 
 ##2024-week-33:
