@@ -6,8 +6,9 @@ import multiprocessing
 import time 
 import numpy as np
 
-MASK_PATH_DICT = {} # it is a dict, key is the mask name, value is the mask path TODO
-PREPROCESS_DATA_ROOT ='' # it is a string, it is the root path of the preprocess dataict, key is the preprocess_tool name, value is the preprocess_tool path TODO
+MASK_PATH_DICT = {'cat_base': {'path': '/Users/sunzhuo/Downloads/Voxel_Aging/mask/volume/cat_base/cat.nii'},
+                  'neuromorphic':{'path': '/Users/sunzhuo/Downloads/Voxel_Aging/mask/volume/neuromorphometrics/neuromorphometrics.nii'}} # it is a dict, key is the mask name, value is the mask path TODO
+PREPROCESS_DATA_ROOT ='/Users/sunzhuo/Downloads/Voxel_Aging/PPMI' # it is a string, it is the root path of the preprocess dataict, key is the preprocess_tool name, value is the preprocess_tool path TODO
 CLINIAL_DATA_CSV = '' # a csv_path that 
 
 def load_roi_feat_to_feat_mat(data_list, data_dict_list, data_root, roi_list_list, out_path_list, cpu_num=4):
@@ -36,7 +37,7 @@ def load_roi_feat_to_feat_mat(data_list, data_dict_list, data_root, roi_list_lis
         feat_type_detail = data_dict['feat_type_detail']
         process_tool = data_dict['process_tool']
         tool_version = data_dict['tool_version']
-        mask_path = MASK_PATH_DICT[mask]
+        mask_path = MASK_PATH_DICT[mask]['path']
         # endregion // load the data description from the data_dict
         # region // check which roi_wise feat extraction need to be done
         folder1 = os.path.join(data_root, feat_type, feat_type_detail, process_tool, tool_version, mask)
