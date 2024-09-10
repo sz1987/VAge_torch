@@ -84,7 +84,7 @@ def load_yaml(filename:str):
         data = yaml.load(f, Loader=yaml.FullLoader)
     return data
 
-def load_pickle(data, file_path):
+def load_pickle(file_path):
     """_summary_
 
     Args:
@@ -273,6 +273,7 @@ def extract_feat_in_ROI_parallel(data_dict, seg, out_folder=None, roi_list=None,
     """
     id_list = list(data_dict.keys())
     n = len(id_list)
+    print(f' there are {n} image to compute in extract_feat_in_ROI_parallel')
     if isinstance(seg, str):
         seg = load_file(seg, only_data=True)
     os.makedirs(out_folder, exist_ok=True)
@@ -282,8 +283,10 @@ def extract_feat_in_ROI_parallel(data_dict, seg, out_folder=None, roi_list=None,
             feat_file = data_dict[im_id][0]
             dataset = data_dict[im_id][1]
             out_folder1 = os.path.join(out_folder, dataset, im_id)
+            print(f'image_{ind}: {im_id}, dataset: {dataset}')
             _ = extract_feat_in_ROI(feat_file, seg, roi_list=roi_list, out_folder=out_folder1)
     else:
+        print('using multiprocessing to extract the feature in parallel')
         pool = multiprocessing.Pool(processes=cpu_num)
         for ind in range(n):
             pool.apply_async(extract_feat_in_ROI, args=(data_dict[id_list[ind]][0], seg, roi_list, 

@@ -1,0 +1,55 @@
+data:
+  data_list_file: /Users/sunzhuo/Documents/GitHub/VAge_torch/exp/config/demo_data_list.csv  # it is a file of csv file, col_1 is the image name, col_2 is the dataset name
+
+  data_dict_list: 
+    - mask: cat_base
+      feat_type: volume
+      feat_type_detail: Modulated_gray_matter_density
+      process_tool: CAT12
+      tool_version: default
+      roi_list:  # if is not given (None), use all ROIs
+
+    - mask: cat_base
+      feat_type: volume
+      feat_type_detail: Modulated_white_matter_density
+      process_tool: CAT12
+      tool_version: default
+      roi_list:  # if is not given (None), use all ROIs
+
+  sys_config: # it is used to set the system for the data, including the preprocessing root, roi feat output root, etc.
+    mask_path_dict:
+      cat_base:
+        path: /Users/sunzhuo/Downloads/Voxel_Aging/mask/volume/cat_base/cat.nii
+      neuromorphic:
+        path: /Users/sunzhuo/Downloads/Voxel_Aging/mask/volume/neuromorphometrics/neuromorphometrics.nii
+    preprocess_data_root: /Users/sunzhuo/Downloads/Voxel_Aging/PPMI
+    roi_feat_root: /Users/sunzhuo/Downloads/Voxel_Aging/test/feat_roi_dataset
+    clinial_data_csv:  # a csv_path that recode the clinical information for each image
+    cpu_num: 4
+  out_root: /Users/sunzhuo/Downloads/Voxel_Aging/test/extract_feat 
+
+
+split:
+  pre_define_split:  # if it is None, not do it, alse, use the ratio do make the 
+  rand_seed:  # if it is not given (None), set the rand_seed for splitting the train/valid/test
+  use_cv: True # if it is True, use the cross validation to split the train/valid/test
+  ratio:
+    train: 0.8
+    val: 0.1
+    test: 0.1
+  
+
+train:
+  batch_size: 32
+  num_workers: 4
+  epochs: 100
+  lr: 0.001
+  weight_decay: 0.0001
+  optimizer: Adam
+  scheduler: None
+  loss: CrossEntropyLoss
+
+loss:
+  CrossEntropyLoss:
+    weight: None
+

@@ -11,7 +11,7 @@ MASK_PATH_DICT = {'cat_base': {'path': '/Users/sunzhuo/Downloads/Voxel_Aging/mas
 PREPROCESS_DATA_ROOT ='/Users/sunzhuo/Downloads/Voxel_Aging/PPMI' # it is a string, it is the root path of the preprocess dataict, key is the preprocess_tool name, value is the preprocess_tool path TODO
 CLINIAL_DATA_CSV = '' # a csv_path that 
 
-def load_roi_feat_to_feat_mat(data_list, data_dict_list, data_root, roi_list_list, out_path_list, cpu_num=4):
+def load_roi_feat_to_feat_mat(data_list, data_dict_list, data_root, roi_list_list, out_path_list, config={}):
     """_summary_
     this function is used to load the roi feature to the feature matrix
     Args:
@@ -20,26 +20,44 @@ def load_roi_feat_to_feat_mat(data_list, data_dict_list, data_root, roi_list_lis
         roi_list_list (_type_): _description_
         out_folder (_type_): _description_
     """
+    # region // step_1, get the setting from the config
+    mask_path_dict = config.get('mask_path_dict', MASK_PATH_DICT)
+    clinical_data_csv = config.get('clinical_data_csv', CLINIAL_DATA_CSV)
+    preprocess_data_root = config.get('preprocess_data_root', PREPROCESS_DATA_ROOT)
+    cpu_num = config.get('cpu_num', 4)
+    print(' ===>>> finish step 1, get the information from config')
+    # endregion // step_1, get the setting from the config
+    # region // step_2, check the input
     nd = len(data_dict_list)
     n2 = len(roi_list_list)
     n3 = len(out_path_list)
     assert nd == n2, 'the number of data_dict_list and roi_list_list should be the same'
     assert nd == n3, 'the number of data_dict_list and out_path_list should be the same'
+    print(' ===>>> finish step_2, check the input')
+    # endregion // step_2, check the input
+    # region // step_3, load the data
     for dind in range(nd):
         re_compute_list = []
         data_dict = data_dict_list[dind]
         print(f'======data_dict_list[{dind}], {time.ctime()}=======')
         print(data_dict)
         roi_list = roi_list_list[dind]
-        # region // load the data description from the data_dict
+        # region // step 3.1, load the data description from the data_dict
         mask = data_dict['mask']
         feat_type = data_dict['feat_type']
         feat_type_detail = data_dict['feat_type_detail']
         process_tool = data_dict['process_tool']
         tool_version = data_dict['tool_version']
-        mask_path = MASK_PATH_DICT[mask]['path']
-        # endregion // load the data description from the data_dict
-        # region // check which roi_wise feat extraction need to be done
+        mask_path = mask_path_dict[mask]['path']
+        # endregion // lstep 3.1, oad the data description from the data_dict
+        # region // step 3.1.1, get the roi_list
+        if roi_list is None:
+            seg = proj_io.load_file(mask_path)
+            all_roi = np.unique(seg)
+            roi_list = all_roi[all_roi>0]
+
+        # endregion // step 3.1.1, get the roi_list
+        # region // step 3.2, check which roi_wise feat extraction need to be done
         folder1 = os.path.join(data_root, feat_type, feat_type_detail, process_tool, tool_version, mask)
         for im_id, dataset in data_list:
             # feat_type/feat_type_detail/preprocess_tool/version/mask_name/dataset/visit_id/ROI_name.pkl
@@ -49,13 +67,15 @@ def load_roi_feat_to_feat_mat(data_list, data_dict_list, data_root, roi_list_lis
 
         if len(re_compute_list) > 0:
             print(f' ===>>> There are {len(re_compute_list)} images need to be recompute to extract roi-wise features, {time.ctime()}')
-            feat_im_path_dict = get_feat_im_path_dict(re_compute_list, data_dict, data_root=PREPROCESS_DATA_ROOT)
+            feat_im_path_dict = get_feat_im_path_dict(re_compute_list, data_dict, data_root=preprocess_data_root)
+            print(' ===>>> feat_im_path_dict')
+            print(feat_im_path_dict)
             proj_io.extract_feat_in_ROI_parallel(feat_im_path_dict, mask_path, out_folder=folder1, roi_list=roi_list, cpu_num=cpu_num)
             print(f' ===>>> Finish at {time.ctime()}')
         else:
             print(f'====>>>>>> already has all the roi_wise feat extracted in the disk')
-        # endregion // check which roi_wise feat extraction need to be done
-        # region // extract the roi-wise feat_vec into the feat_mat
+        # endregion // step 3.2, check which roi_wise feat extraction need to be done
+        # region // step 3.3, extract the roi-wise feat_vec into the feat_mat
         print(f' === collecting the roi-wise feat_vec into the feat_mat, for {len(roi_list)} ROIs, {time.ctime()}')
         out_path0 = out_path_list[dind]
         out_root0 = os.path.split(out_path0)[0]
@@ -72,8 +92,8 @@ def load_roi_feat_to_feat_mat(data_list, data_dict_list, data_root, roi_list_lis
             proj_io.save_pickle(feat_mat, out_pkl)
         print(f' === Finish collecting the roi-wise feat_vec into the feat_mat, {time.ctime()}')
 
-        # endregion //  extract the roi-wise feat_vec into the feat_mat
-
+        # endregion // step 3.3, extract the roi-wise feat_vec into the feat_mat
+    # endregion // step_3, load the data
 def check_exist_all_roi(root, roi_list):
     """_summary_
     this function is used to check if all the roi exist in the root folder
@@ -174,6 +194,6 @@ def generate_sub_roi_feat(data_list, data_dict_list, data_root, roi_list_list, c
         print(f'======data_dict_list[{dind}], {time.ctime()}=======')
         print(data_dict)
         folder1 = os.path.join(data_root, feat_type, feat_type_detail, process_tool, tool_version, mask)
-        feat_im_path_dict = get_feat_im_path_dict(data_list, data_dict, data_root=PREPROCESS_DATA_ROOT)
+        feat_im_path_dict = get_feat_im_path_dict(data_list, data_dict, data_root=preprocess_data_root)
         proj_io.extract_feat_in_ROI_parallel(feat_im_path_dict, mask_path, out_folder=folder1, roi_list=roi_list, cpu_num=cpu_num)
         # endregion // get the feat_im path for each im_id
